@@ -1,0 +1,35 @@
+{
+	"intents": [{
+		"intent": "food",
+		"slots": [{
+			"name": "foodName",
+			"type": "LITERAL"
+		}, {
+			"name": "calories",
+			"type": "NUMBER"
+		},
+    {
+			"name": "nutrients",
+			"type": "LITERAL"
+		},
+    ]
+	}, {
+		"intent": "favFood",
+		"slots": [{
+			"name": "foodName",
+			"type": "LITERAL"
+		}]
+	}, {
+		"intent": "recentFood",
+		"slots": [{
+			"name": "foodName",
+			"type": "LITERAL"
+		}, {
+			"name": "lastMealTime",
+			"type": "TIME"
+		}, {
+			"name": "lastMealDate",
+			"type": "DATE"
+		}]
+	}]
+}
