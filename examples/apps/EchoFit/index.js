@@ -121,17 +121,112 @@ app.intent('weightInIntent',{
 									"I'm weighing {1-500|weight} {pounds|kilograms|kilos|units}",
 									"Currently, my weight is {1-500|weight} {pounds|kilograms|kilos|units}",
 									"Currently, I weigh {1-500|weight} {pounds|kilograms|kilos|units}"]
+								},
+								function(req,res) {
+									var weight;
+									var goalWeight = 120;
+									var goalProgress = goalWeight - req.slot('weight');
+									if (req.slot('units')=='kilos'||'kilograms') {
+										//convertion to pounds
+									}
+res.say('OK, you need to lose '+ goalProgress + ' pounds to reach your goal');
+								}
+							);
+
+app.intent('addToMealIntent',{
+		"slots":{"foodName":"LITERAL", "mealName":"LITERAL", "foodQuantity":"LITERAL", "servingName":"LITERAL"},
+		"utterances":[
+"I'm eating {foodName}",
+"I ate {foodName}",
+"I had {foodName}",
+"I just ate {foodName}",
+"I'm eating {foodQuantity} {foodName}",
+"I'm eating {foodQuantity} of {foodName}",
+"I'm eating {foodQuantity} {servingName} of {foodName}",
+"I ate {foodQuantity} {foodName}",
+"I ate {foodQuantity} of {foodName}",
+"I ate {foodQuantity} {servingName} of {foodName}",
+"I had {foodQuantity} {foodName}",
+"I had {foodQuantity} of {foodName}",
+"I had {foodQuantity} {servingName} of {foodName}",
+"I just ate {foodQuantity} {foodName}",
+"I just ate {foodQuantity} of {foodName}",
+"I just ate {foodQuantity} {servingName} of {foodName}",
+"I'm eating {foodName} for {mealName}",
+"I ate {foodName} for {mealName}",
+"I had {foodName} for {mealName}",
+"I just ate {foodName} for {mealName}",
+"I just had {foodName} for {mealName}",
+"for {mealName} I'm eating {foodName}",
+"for {mealName} I ate {foodName}",
+"for {mealName} I had {foodName}",
+"for {mealName} I just ate {foodName}",
+"for {mealName} I just had {foodName}",
+"I'm eating {foodQuantity} {foodName} for {mealName}",
+"I'm eating {foodQuantity} of {foodName} for {mealName}",
+"I'm eating {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I ate {foodQuantity} {foodName} for {mealName}",
+"I ate {foodQuantity} of {foodName} for {mealName}",
+"I ate {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I had {foodQuantity} {foodName} for {mealName}",
+"I had {foodQuantity} of {foodName} for {mealName}",
+"I had {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I just ate {foodQuantity} {foodName} for {mealName}",
+"I just ate {foodQuantity} of {foodName} for {mealName}",
+"I just ate {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I just had {foodQuantity} {foodName} for {mealName}",
+"I just had {foodQuantity} of {foodName} for {mealName}",
+"I just had {foodQuantity} {servingName} of {foodName} for {mealName}",
+"for {mealName} I'm eating {foodQuantity} {foodName}",
+"for {mealName} I'm eating {foodQuantity} of {foodName}",
+"for {mealName} I'm eating {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I ate {foodQuantity} {foodName}",
+"for {mealName} I ate {foodQuantity} of {foodName}",
+"for {mealName} I ate {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I had {foodQuantity} {foodName}",
+"for {mealName} I had {foodQuantity} of {foodName}",
+"for {mealName} I had {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I just ate {foodQuantity} {foodName}",
+"for {mealName} I just ate {foodQuantity} of {foodName}",
+"for {mealName} I just ate {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I just had {foodQuantity} {foodName}",
+"for {mealName} I just had {foodQuantity} of {foodName}",
+"for {mealName} I just had {foodQuantity} {servingName} of {foodName}"]
 	},
 	function(req,res) {
-	  var weight;
-		var goalWeight = 120;
-		var goalProgress = goalWeight - req.slot('weight');
-		if (req.slot('units')=='kilos'||'kilograms') {
-			//convertion to pounds
+		var foodName = req.slot('foodName');
+		var foodQuantity = -1;
+		var mealName = -1;
+
+		if (req.slot('foodQuantity')=='a' || req.slot('foodQuantity')=='an') {
+			foodQuantity = 1;
+		}
+		else {
+			foodQuantity = parseInt(req.slot('foodQuantity'));
 		}
 
-		res.say('OK, you need to lose '+ goalProgress + ' pounds to reach your goal');
+		if (req.slot('mealName') == null) {
+			if(Date().getHours() >= 3 && Date().getHours() < 11){
+				mealName="breakfast";				
+			}
+			else if(Date().getHours() >= 11 && Date().getHours() < 17){
+				mealName="lunch";
+			}
+			else if(Date().getHours() >= 17 || Date().getHours() < 3){
+				mealName="dinner";
+			}
+		}
+		else {
+			mealName = req.slot('mealName');
+		}
+
+		//insert API code here
+
+		res.say('Okay, I logged '+req.slot('foodQuantity')+req.slot('foodName')+' for '+req.slot('mealName'));
 	}
 );
+
+
+
 
 module.exports = app;
