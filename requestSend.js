@@ -81,11 +81,11 @@ var userAuth = {
 //requestUserToken(requestID);
 //getAccessToken(userAuth);
 
-//callSearchAPI(foodSearch);
+callSearchAPI(foodSearch);
 //callGeneralAPI(genProfile);
 //authenticate(getAuth, editWeight, 100);
 //authenticate(getAuth, getProfile, null);
-callTokenAPI(getRyanInfo);
+//callTokenAPI(getRyanInfo);
 
 function callSearchAPI(reqObj)
 {
