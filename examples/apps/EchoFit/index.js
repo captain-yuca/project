@@ -104,6 +104,28 @@ app.intent('addToMealIntent',{
 	}
 );
 
+app.intent('getRecentlyEatenIntent',{
+		"slots":{"mealName":"LITERAL"},
+		"utterances":[
+"what did I eat for {mealName}",
+"what did I have for {mealName}",
+"what foods did I eat for {mealName}",
+"what foods did I have for {mealName}",
+"for {mealName} what did I eat",
+"for {mealName} what did I have",
+"for {mealName} what foods did I eat",
+"for {mealName} what foods did I have"
+		]
+	},
+	function(req,res) {
+		var mealName = req.slot('mealName');
+		
+		//insert API code here
+		
+		//res.say('For '+MEAL_NAME_RETURN_VAL+, I logged '+req.slot('foodQuantity')+req.slot('foodName')+' for '+req.slot('mealName');
+	}
+);
+
 app.intent('foodCalorieIntent',{
 		"slots":{"foodName":"LITERAL"}
 		,"utterances":["How many calories in {apple|banana|foodName}"]
