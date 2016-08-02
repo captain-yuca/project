@@ -87,10 +87,10 @@ app.intent('addToMealIntent',{
 			if(Date().getHours() >= 3 && Date().getHours() < 11){
 				mealName="breakfast";				
 			}
-			else if(Date().getHours() >= 11 && Date().getHours() < 5){
+			else if(Date().getHours() >= 11 && Date().getHours() < 17){
 				mealName="lunch";				
 			}
-			else if(Date().getHours() >= 5 && Date().getHours() < 3){
+			else if(Date().getHours() >= 17 || Date().getHours() < 3){
 				mealName="dinner";				
 			}
 		}
