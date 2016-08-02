@@ -1,5 +1,5 @@
 // Dependencies and constants
-
+  
 var http = require('http'),
     fs = require('fs'),
     rest              = require('restler'),
@@ -12,37 +12,61 @@ var http = require('http'),
     requestTokenUrl   = 'http://www.fatsecret.com/oauth/request_token',
     date             = new Date;
 
+/////////////////////** REQUEST OBJECTS **///////////////////////////////////////////
+
 // Note that the keys MUST BE in alphabetical order
-var requestID = {
-  oauth_callback: 'oob',
-  oauth_consumer_key: apiKey,
-  oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
-  oauth_signature_method: 'HMAC-SHA1',
-  oauth_timestamp: Math.floor(date.getTime() / 1000),
-  oauth_version: '1.0'
-};
+// var requestID = {
+//   oauth_callback: 'oob',
+//   oauth_consumer_key: apiKey,
+//   oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+//   oauth_signature_method: 'HMAC-SHA1',
+//   oauth_timestamp: Math.floor(date.getTime() / 1000),
+//   oauth_version: '1.0'
+// };
 
-var genProfile = {
-  format: 'json',
-  method: 'profile.create',
-  oauth_consumer_key: apiKey,
-  oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
-  oauth_signature_method: 'HMAC-SHA1',
-  oauth_timestamp: Math.floor(date.getTime() / 1000),
-  oauth_version: '1.0',
-  user_id: "TEST1"
-};
+// var genProfile = {
+//   format: 'json',
+//   method: 'profile.create',
+//   oauth_consumer_key: apiKey,
+//   oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+//   oauth_signature_method: 'HMAC-SHA1',
+//   oauth_timestamp: Math.floor(date.getTime() / 1000),
+//   oauth_version: '1.0',
+//   user_id: "TEST1"
+// };
 
-// current accts are: CTKnoll, NAKnoll
-var getAuth = {
+// // current accts are: CTKnoll, NAKnoll
+// var getAuth = {
+//   format: 'json',
+//   method: 'profile.get_auth',
+//   oauth_consumer_key: apiKey,
+//   oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+//   oauth_signature_method: 'HMAC-SHA1',
+//   oauth_timestamp: Math.floor(date.getTime() / 1000),
+//   oauth_version: '1.0',
+//   user_id: "CTKnoll"
+// };
+
+// var userAuth = {
+//   oauth_consumer_key: apiKey,
+//   oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+//   oauth_signature_method: 'HMAC-SHA1',
+//   oauth_timestamp: Math.floor(date.getTime() / 1000),
+//   oauth_token: 'a89317f85f3d40e79b8e1d08204ec363',
+//   oauth_verifier: '3870685',
+//   oauth_version: '1.0'
+// };
+
+var getRyanInfo = {
   format: 'json',
-  method: 'profile.get_auth',
+  method: 'profile.get',
   oauth_consumer_key: apiKey,
   oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
   oauth_signature_method: 'HMAC-SHA1',
   oauth_timestamp: Math.floor(date.getTime() / 1000),
+  oauth_token: '121fcf7d265a48df94219a9aac64f47c',
   oauth_version: '1.0',
-  user_id: "CTKnoll"
+
 };
 
 var foodSearch = {
@@ -56,12 +80,28 @@ var foodSearch = {
   search_expression: "bread" // test query
 };
 
+/////////////////////** MAIN CALLS **/////////////////////////////////////////////////
+
+//requestUserToken(requestID);
+//getAccessToken(userAuth);
+//callGeneralAPI(genProfile);
+//authenticate(getAuth, editWeight, 100);
+//authenticate(getAuth, getProfile, null);
 
 callSearchAPI(foodSearch);
-//requestUserToken(requestID);
-//callGeneralAPI(genProfile);
-//authenticate(getAuth);
+setTimeout(run, 1000);
+function run()
+{
+  console.log(global.help);
+}
 
+
+//callTokenAPI(getRyanInfo);
+//editRyanWeight(getRyanInfo, 65);
+//addRyanFoodItem(getRyanInfo, 38820, 2, "breakfast", 38629);
+
+
+/////////////////////** API CALL METHODS **///////////////////////////////////////////
 
 function callSearchAPI(reqObj)
 {
@@ -91,7 +131,7 @@ function callSearchAPI(reqObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-      setUpDetailedView(data);
+      return getFoodInfo(data);
   });
 }
 
@@ -125,12 +165,12 @@ function callGeneralAPI(reqObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-
-      console.log(data);
+      console.log(data.food.servings.serving[0].calories);
+      global.help = data.food.servings.serving[0].calories;
   });
 }
 
-function callTokenAPI(reqObj, dataObj)
+function callTokenAPI(reqObj)
 {
   // construct a param=value& string and uriEncode
   var paramsStr = '';
@@ -147,7 +187,8 @@ function callTokenAPI(reqObj, dataObj)
                    + encodeURIComponent(paramsStr);
 
   // no  Access Token token (there's no user .. we're just calling foods.search)
-  sharedSecret2 = sharedSecret + "&" + dataObj.profile.auth_secret.toString();
+  //sharedSecret2 = sharedSecret + "&" + dataObj.profile.auth_secret.toString();
+  sharedSecret2 = sharedSecret + "&" + '9c974fb87f534a5297a850d674b11432';
 
   var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
 
@@ -160,12 +201,12 @@ function callTokenAPI(reqObj, dataObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-
+    
       console.log(data);
   });
 }
 
-function setUpDetailedView(data)
+function getFoodInfo(data)
 {
     var newDate = new Date;
     var foodObj = {
@@ -178,7 +219,7 @@ function setUpDetailedView(data)
     oauth_timestamp: Math.floor(newDate.getTime() / 1000),
     oauth_version: '1.0'
   };
-  callGeneralAPI(foodObj);
+  return callGeneralAPI(foodObj);
 }
 
 function requestUserToken(reqObj)
@@ -211,7 +252,7 @@ function requestUserToken(reqObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-    userAuthorize(data);
+    console.log(data);
   });
 }
 
@@ -222,17 +263,50 @@ function userAuthorize(reqData)
     rest.post('http://www.fatsecret.com/oauth/authorize', {
     data: {oauth_token: split}
     }).on('complete', function(data, response) {
-      //convert the data from XML to JSON format
-      http.createServer(function(request, response) {
-          response.writeHeader(200, {"Content-Type": "text/html"});
-          response.write(data);
-          response.end();
+      //convert the data from XML to JSON format     
+      http.createServer(function(request, response) {  
+          response.writeHeader(200, {"Content-Type": "text/html"});  
+          response.write(data);  
+          response.end();  
       }).listen(8000);
 });
-
+    
 }
 
-function authenticate(reqObj)
+function getAccessToken(reqObj)
+{
+    var paramsStr = '';
+  for (var i in reqObj) {
+    paramsStr += "&" + i + "=" + reqObj[i];
+  }
+
+  // yank off that first "&"
+  paramsStr = paramsStr.substr(1);
+
+  var sigBaseStr = "POST&"
+                   + encodeURIComponent('http://www.fatsecret.com/oauth/access_token')
+                   + "&"
+                   + encodeURIComponent(paramsStr);
+
+  // no  Access Token token (there's no user .. we're just calling foods.search)
+  sharedSecret2 = sharedSecret + "&" + 'db87e81b060d4d3a8f3c022a259cc9aa';
+
+  var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
+
+
+  // Add oauth_signature to the request object
+  reqObj.oauth_signature = hashedBaseStr;
+
+  // Launch!
+  rest.post('http://www.fatsecret.com/oauth/access_token', {
+    data: reqObj
+  }).on('complete', function(data, response) {
+    //convert the data from XML to JSON format
+    console.log(data);
+  });
+}
+
+function authenticate(reqObj, callback, val)
 {
     // construct a param=value& string and uriEncode
   var paramsStr = '';
@@ -260,14 +334,14 @@ function authenticate(reqObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-      getProfile(data);
+      data.customVal = val;
+      callback(data);
   });
 }
 
 function getProfile(data)
 {
     var newDate = new Date;
-    console.log(data.profile.auth_token);
     var profileFromID = {
     format: 'json',
     method: 'profile.get',
@@ -279,4 +353,64 @@ function getProfile(data)
     oauth_version: '1.0'
   };
   callTokenAPI(profileFromID, data);
+}
+
+//current height and goal weight arent required, and require us to customize it for first time use
+function editWeight(data)
+{
+    var newDate = new Date;
+    var profileFromID = {
+    //current_height_cm: 200,
+    current_weight_kg: data.customVal,
+    format: 'json',
+    //goal_weight_kg: 100,
+    method: 'weight.update',
+    oauth_consumer_key: apiKey,
+    oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_timestamp: Math.floor(newDate.getTime() / 1000),
+    oauth_token: data.profile.auth_token.toString(),
+    oauth_version: '1.0'
+  };
+  callTokenAPI(profileFromID, data);
+}
+
+function editRyanWeight(data, number)
+{
+    var newDate = new Date;
+    var profileFromID = {
+    //current_height_cm: 200,
+    current_weight_kg: number,
+    format: 'json',
+    //goal_weight_kg: 100,
+    method: 'weight.update',
+    oauth_consumer_key: apiKey,
+    oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_timestamp: Math.floor(newDate.getTime() / 1000),
+    oauth_token: data.oauth_token,
+    oauth_version: '1.0'
+  };
+  callTokenAPI(profileFromID);
+}
+
+function addRyanFoodItem(data, id, quantity, meal, serveId)
+{
+    var newDate = new Date;
+    var profileFromID = {
+    food_entry_name: "temp",
+    food_id: id,
+    format: 'json',
+    meal: meal,
+    method: 'food_entry.create',
+    number_of_units: quantity,
+    oauth_consumer_key: apiKey,
+    oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_timestamp: Math.floor(newDate.getTime() / 1000),
+    oauth_token: data.oauth_token,
+    oauth_version: '1.0',
+    serving_id: serveId
+  };
+  callTokenAPI(profileFromID);
 }
