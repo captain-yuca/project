@@ -4,6 +4,7 @@ var http = require('http'),
     fs = require('fs'),
     rest              = require('restler'),
     crypto            = require('crypto'),
+    touch             = require('touch'),
     apiKey           = 'bf03affc64d64ff7950950f990b34b21',
     sharedSecret     = '7a19de3308544f93a4971d1242101e7d',
     //apiKey2          = 'ddde9b47ca8445cc94110085df4de397',
@@ -88,17 +89,12 @@ var foodSearch = {
 //authenticate(getAuth, editWeight, 100);
 //authenticate(getAuth, getProfile, null);
 
-callSearchAPI(foodSearch);
-setTimeout(run, 1000);
-function run()
-{
-  console.log(global.help);
-}
+//callSearchAPI(foodSearch);
 
 
 //callTokenAPI(getRyanInfo);
 //editRyanWeight(getRyanInfo, 65);
-//addRyanFoodItem(getRyanInfo, 38820, 2, "breakfast", 38629);
+addRyanFoodItem(getRyanInfo, 38820, 2, "breakfast", 38629);
 
 
 /////////////////////** API CALL METHODS **///////////////////////////////////////////
@@ -201,8 +197,19 @@ function callTokenAPI(reqObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-    
+      var newDate = new Date();
       console.log(data);
+      if(reqObj.method == "food_entry.create")
+      {
+          touch((newDate.getMonth()+1)+(newDate.getUTCDate())+(newDate.getFullYear())+".txt",{});
+          fs.appendFile((newDate.getMonth()+1)+(newDate.getUTCDate())+(newDate.getFullYear())+".txt", data.food_entry_id.value+"\n", function(err) {
+          if(err) {
+              return console.log(err);
+            }
+
+            console.log("The file was saved!");
+        }); 
+      }
   });
 }
 
@@ -398,7 +405,7 @@ function addRyanFoodItem(data, id, quantity, meal, serveId)
 {
     var newDate = new Date;
     var profileFromID = {
-    food_entry_name: "temp",
+    food_entry_name: meal,
     food_id: id,
     format: 'json',
     meal: meal,
