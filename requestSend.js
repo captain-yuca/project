@@ -94,7 +94,7 @@ var foodSearch = {
 
 //callTokenAPI(getRyanInfo);
 //editRyanWeight(getRyanInfo, 65);
-addRyanFoodItem(getRyanInfo, 38820, 2, "breakfast", 38629);
+//addRyanFoodItem(getRyanInfo, 38820, 2, "breakfast", 38629);
 
 
 /////////////////////** API CALL METHODS **///////////////////////////////////////////
