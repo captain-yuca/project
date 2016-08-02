@@ -1,4 +1,15 @@
 var alexa = require('alexa-app');
+var http = require('http'),
+    fs = require('fs'),
+    rest              = require('restler'),
+    crypto            = require('crypto'),
+    apiKey           = 'bf03affc64d64ff7950950f990b34b21',
+    sharedSecret     = '7a19de3308544f93a4971d1242101e7d',
+    //apiKey2          = 'ddde9b47ca8445cc94110085df4de397',
+    //secret2          = '44e97c7918354c42b01c905d46394889'
+    fatSecretRestUrl = 'http://platform.fatsecret.com/rest/server.api',
+    requestTokenUrl   = 'http://www.fatsecret.com/oauth/request_token',
+    date             = new Date;
 
 // Allow this module to be reloaded by hotswap when changed
 module.change_code = 1;
@@ -37,24 +48,123 @@ app.launch(function(req,res) {
 // 		res.say(req.slot('foodName')+' has '+ calories);
 // 	}
 // );
-// app.intent('checkCaloriesIntent',{
-// 		"slots":{"foodName":"LITERAL", "mealName":"LITERAL"}
-// 		,"utterances":["How many calories in {apple|banana|foodName}"]
-// 	},
-// 	function(req,res) {
-// 	  var calories;
-// 		if (req.slot('foodName')=='apple') {
-// 			calories = 20;
-// 		}
-// 		else if (req.slot('foodName')=='banana') {
-// 			calories = 30;
-// 		}
-// 		else {
-// 			res.say("What are you doing?!");
-// 		}
-// 		res.say(req.slot('foodName')+' has '+ calories);
-// 	}
-// );
+app.intent('checkCaloriesIntent',{
+		"slots":{"foodName":"LITERAL", "mealName":"LITERAL"}
+		,"utterances":["How many calories in {apple|banana|foodName}"]
+	},
+	function(req,res) {
+	  var calories;
+		var foodSearch = {
+		  format: 'json',
+		  method: 'foods.search',
+		  oauth_consumer_key: apiKey,
+		  oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+		  oauth_signature_method: 'HMAC-SHA1',
+		  oauth_timestamp: Math.floor(date.getTime() / 1000),
+		  oauth_version: '1.0',
+		  search_expression: "bread" // test query
+		};
+		callSearchAPI(foodSearch, function(results1){
+        console.log(results1 + ' in callSearchAPI');
+            setUpDetailedView(results1, function(results2){
+              console.log(results2 + ' in setUpDetailedView');
+                callGeneralAPI(results2, function(results3){
+                  console.log(results3 + ' in callGeneralAPI');
+                    global.calories = results3.food.servings.serving[0].calories;
+                    console.log(global.calories);
+                    res.say(req.slot('foodName')+' has '+ global.calories + 'calories');
+                    res.send();
+                });
+            });
+        });
+
+        return false;
+		}
+
+
+);
+function callSearchAPI(reqObj, callback)
+{
+  // construct a param=value& string and uriEncode
+  var paramsStr = '';
+  for (var i in reqObj) {
+    paramsStr += "&" + i + "=" + reqObj[i];
+  }
+
+  // yank off that first "&"
+  paramsStr = paramsStr.substr(1);
+
+  var sigBaseStr = "POST&"
+                   + encodeURIComponent(fatSecretRestUrl)
+                   + "&"
+                   + encodeURIComponent(paramsStr);
+
+  // no  Access Token token (there's no user .. we're just calling foods.search)
+  sharedSecret2 = sharedSecret + "&";
+
+  var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
+
+  // Add oauth_signature to the request object
+  reqObj.oauth_signature = hashedBaseStr;
+  // Launch!
+  rest.post(fatSecretRestUrl, {
+    data: reqObj
+  }).on('complete', function(data, response) {
+    //convert the data from XML to JSON format
+      callback(data);
+  });
+}
+function setUpDetailedView(data, callback)
+{
+    var newDate = new Date;
+    var foodObj = {
+    food_id: data.foods.food[0].food_id,
+    format: 'json',
+    method: 'food.get',
+    oauth_consumer_key: apiKey,
+    oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+    oauth_signature_method: 'HMAC-SHA1',
+    oauth_timestamp: Math.floor(newDate.getTime() / 1000),
+    oauth_version: '1.0'
+  };
+  callback(foodObj);
+}
+function callGeneralAPI(reqObj, callback)
+{
+  // construct a param=value& string and uriEncode
+  var paramsStr = '';
+  for (var i in reqObj) {
+    paramsStr += "&" + i + "=" + reqObj[i];
+  }
+
+  // yank off that first "&"
+  paramsStr = paramsStr.substr(1);
+
+  var sigBaseStr = "POST&"
+                   + encodeURIComponent(fatSecretRestUrl)
+                   + "&"
+                   + encodeURIComponent(paramsStr);
+
+  // no  Access Token token (there's no user .. we're just calling foods.search)
+  sharedSecret2 = sharedSecret + "&";
+
+  var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
+
+
+  // Add oauth_signature to the request object
+  reqObj.oauth_signature = hashedBaseStr;
+
+  // Launch!
+  rest.post(fatSecretRestUrl, {
+    data: reqObj
+  }).on('complete', function(data, response) {
+    //convert the data from XML to JSON format
+
+      callback(data);
+  });
+}
+
+
 // app.intent('removeFromMeal',{
 // 		"slots":{"foodName":"LITERAL"}
 // 		,"utterances":["How many calories in {apple|banana|foodName}"]
@@ -207,7 +317,7 @@ app.intent('addToMealIntent',{
 
 		if (req.slot('mealName') == null) {
 			if(Date().getHours() >= 3 && Date().getHours() < 11){
-				mealName="breakfast";				
+				mealName="breakfast";
 			}
 			else if(Date().getHours() >= 11 && Date().getHours() < 17){
 				mealName="lunch";
@@ -225,6 +335,7 @@ app.intent('addToMealIntent',{
 		res.say('Okay, I logged '+req.slot('foodQuantity')+req.slot('foodName')+' for '+req.slot('mealName'));
 	}
 );
+
 
 
 
