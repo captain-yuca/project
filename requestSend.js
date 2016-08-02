@@ -1,10 +1,11 @@
 // Dependencies and constants
 
-var http = require('http'),
-    fs = require('fs'),
+var http              = require('http'),
+    fs                = require('fs'),
     rest              = require('restler'),
     crypto            = require('crypto'),
     touch             = require('touch'),
+    lineReader        = require('readline'),
     apiKey           = 'bf03affc64d64ff7950950f990b34b21',
     sharedSecret     = '7a19de3308544f93a4971d1242101e7d',
     //apiKey2          = 'ddde9b47ca8445cc94110085df4de397',
@@ -420,4 +421,26 @@ function addRyanFoodItem(data, id, quantity, meal, serveId)
     serving_id: serveId
   };
   callTokenAPI(profileFromID);
+}
+
+function tallyFoodItems(data)
+{
+  var nutrients = [];
+  touch((newDate.getMonth()+1)+(newDate.getUTCDate())+(newDate.getFullYear())+".txt",{});
+  lineReader.createInterface({input: fs.createReadStream((newDate.getMonth()+1)+(newDate.getUTCDate())+(newDate.getFullYear())+".txt")});
+  lineReader.on('line', function (line) 
+  {
+      var profileFromID = {
+        food_entry_id: parseInt(line, 10),
+        format: 'json',
+        method: 'food_entries.get',
+        oauth_consumer_key: apiKey,
+        oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+        oauth_signature_method: 'HMAC-SHA1',
+        oauth_timestamp: Math.floor(newDate.getTime() / 1000),
+        oauth_token: data.oauth_token,
+        oauth_version: '1.0'
+      };
+      callTokenAPI(profileFromID);
+  });
 }
