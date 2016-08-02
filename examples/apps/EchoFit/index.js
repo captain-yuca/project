@@ -332,7 +332,9 @@ app.intent('addToMealIntent',{
 
 		//insert API code here
 
+
 		res.say('Okay, I logged '+req.slot('foodQuantity')+req.slot('foodName')+' for '+req.slot('mealName'));
+
 	}
 );
 
