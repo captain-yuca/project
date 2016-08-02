@@ -10,6 +10,100 @@ app.launch(function(req,res) {
 	var prompt = "Ask away";
 	res.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
+
+app.intent('addToMealIntent',{
+		"slots":{"foodName":"LITERAL", "mealName":"LITERAL", "foodQuantity":"LITERAL", "servingName":"LITERAL"},
+		"utterances":[
+"I'm eating {foodName}",
+"I ate {foodName}",
+"I had {foodName}",
+"I just ate {foodName}",
+"I'm eating {foodQuantity} {foodName}",
+"I'm eating {foodQuantity} of {foodName}",
+"I'm eating {foodQuantity} {servingName} of {foodName}",
+"I ate {foodQuantity} {foodName}",
+"I ate {foodQuantity} of {foodName}",
+"I ate {foodQuantity} {servingName} of {foodName}",
+"I had {foodQuantity} {foodName}",
+"I had {foodQuantity} of {foodName}",
+"I had {foodQuantity} {servingName} of {foodName}",
+"I just ate {foodQuantity} {foodName}",
+"I just ate {foodQuantity} of {foodName}",
+"I just ate {foodQuantity} {servingName} of {foodName}",
+"I'm eating {foodName} for {mealName}",
+"I ate {foodName} for {mealName}",
+"I had {foodName} for {mealName}",
+"I just ate {foodName} for {mealName}",
+"I just had {foodName} for {mealName}",
+"for {mealName} I'm eating {foodName}",
+"for {mealName} I ate {foodName}",
+"for {mealName} I had {foodName}",
+"for {mealName} I just ate {foodName}",
+"for {mealName} I just had {foodName}",
+"I'm eating {foodQuantity} {foodName} for {mealName}",
+"I'm eating {foodQuantity} of {foodName} for {mealName}",
+"I'm eating {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I ate {foodQuantity} {foodName} for {mealName}",
+"I ate {foodQuantity} of {foodName} for {mealName}",
+"I ate {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I had {foodQuantity} {foodName} for {mealName}",
+"I had {foodQuantity} of {foodName} for {mealName}",
+"I had {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I just ate {foodQuantity} {foodName} for {mealName}",
+"I just ate {foodQuantity} of {foodName} for {mealName}",
+"I just ate {foodQuantity} {servingName} of {foodName} for {mealName}",
+"I just had {foodQuantity} {foodName} for {mealName}",
+"I just had {foodQuantity} of {foodName} for {mealName}",
+"I just had {foodQuantity} {servingName} of {foodName} for {mealName}",
+"for {mealName} I'm eating {foodQuantity} {foodName}",
+"for {mealName} I'm eating {foodQuantity} of {foodName}",
+"for {mealName} I'm eating {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I ate {foodQuantity} {foodName}",
+"for {mealName} I ate {foodQuantity} of {foodName}",
+"for {mealName} I ate {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I had {foodQuantity} {foodName}",
+"for {mealName} I had {foodQuantity} of {foodName}",
+"for {mealName} I had {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I just ate {foodQuantity} {foodName}",
+"for {mealName} I just ate {foodQuantity} of {foodName}",
+"for {mealName} I just ate {foodQuantity} {servingName} of {foodName}",
+"for {mealName} I just had {foodQuantity} {foodName}",
+"for {mealName} I just had {foodQuantity} of {foodName}",
+"for {mealName} I just had {foodQuantity} {servingName} of {foodName}"]
+	},
+	function(req,res) {
+		var foodName = req.slot('foodName');
+		var foodQuantity = -1;
+		var mealName = -1;
+	  
+		if (req.slot('foodQuantity')=='a' || req.slot('foodQuantity')=='an') {
+			foodQuantity = 1;
+		}
+		else {
+			foodQuantity = parseInt(req.slot('foodQuantity'));
+		}
+		
+		if (req.slot('mealName') == null) {
+			if(Date().getHours() >= 3 && Date().getHours() < 11){
+				mealName="breakfast";				
+			}
+			else if(Date().getHours() >= 11 && Date().getHours() < 5){
+				mealName="lunch";				
+			}
+			else if(Date().getHours() >= 5 && Date().getHours() < 3){
+				mealName="dinner";				
+			}
+		}
+		else {
+			mealName = req.slot('mealName');
+		}
+
+		//insert API code here
+		
+		res.say('Okay, I logged '+req.slot('foodQuantity')+req.slot('foodName')+' for '+req.slot('mealName');
+	}
+);
+
 app.intent('foodCalorieIntent',{
 		"slots":{"foodName":"LITERAL"}
 		,"utterances":["How many calories in {apple|banana|foodName}"]
@@ -38,7 +132,7 @@ app.intent('recentFoodIntent',{
 );
 app.intent('favFoodIntent',{
 		"slots":{"foodName":"LITERAL"}
-		,"utterances":["How many calories in {apple|banana|foodName}"]
+		,"utterances":["How many calories in {apple|banana|foodName}",]
 	},
 	function(req,res) {
 	  var calories;
