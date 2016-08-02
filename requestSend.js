@@ -1,5 +1,5 @@
 // Dependencies and constants
-  
+
 var http = require('http'),
     fs = require('fs'),
     rest              = require('restler'),
@@ -89,6 +89,7 @@ var foodSearch = {
 //authenticate(getAuth, editWeight, 100);
 //authenticate(getAuth, getProfile, null);
 
+
 //callSearchAPI(foodSearch);
 
 
@@ -152,7 +153,6 @@ function callGeneralAPI(reqObj)
 
   var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
 
-
   // Add oauth_signature to the request object
   reqObj.oauth_signature = hashedBaseStr;
 
@@ -208,7 +208,7 @@ function callTokenAPI(reqObj)
             }
 
             console.log("The file was saved!");
-        }); 
+        });
       }
   });
 }
@@ -270,14 +270,14 @@ function userAuthorize(reqData)
     rest.post('http://www.fatsecret.com/oauth/authorize', {
     data: {oauth_token: split}
     }).on('complete', function(data, response) {
-      //convert the data from XML to JSON format     
-      http.createServer(function(request, response) {  
-          response.writeHeader(200, {"Content-Type": "text/html"});  
-          response.write(data);  
-          response.end();  
+      //convert the data from XML to JSON format
+      http.createServer(function(request, response) {
+          response.writeHeader(200, {"Content-Type": "text/html"});
+          response.write(data);
+          response.end();
       }).listen(8000);
 });
-    
+
 }
 
 function getAccessToken(reqObj)
