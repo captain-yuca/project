@@ -88,10 +88,8 @@ var foodSearch = {
 //authenticate(getAuth, editWeight, 100);
 //authenticate(getAuth, getProfile, null);
 
-var help; 
 callSearchAPI(foodSearch);
-
-console.log(help);
+setTimeout(function(){console.log(global.help);}, 1000);
 
 
 //callTokenAPI(getRyanInfo);
@@ -129,7 +127,7 @@ function callSearchAPI(reqObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-      getFoodInfo(data);
+      return getFoodInfo(data);
   });
 }
 
@@ -163,7 +161,8 @@ function callGeneralAPI(reqObj)
     data: reqObj
   }).on('complete', function(data, response) {
     //convert the data from XML to JSON format
-      help = data.food.servings.serving[0].calories;
+      console.log(data.food.servings.serving[0].calories);
+      global.help = data.food.servings.serving[0].calories;
   });
 }
 
@@ -216,7 +215,7 @@ function getFoodInfo(data)
     oauth_timestamp: Math.floor(newDate.getTime() / 1000),
     oauth_version: '1.0'
   };
-  callGeneralAPI(foodObj);
+  return callGeneralAPI(foodObj);
 }
 
 function requestUserToken(reqObj)
