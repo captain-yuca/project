@@ -89,7 +89,11 @@ var foodSearch = {
 //authenticate(getAuth, getProfile, null);
 
 callSearchAPI(foodSearch);
-setTimeout(function(){console.log(global.help);}, 1000);
+setTimeout(run, 1000);
+function run()
+{
+  console.log(global.help);
+}
 
 
 //callTokenAPI(getRyanInfo);
