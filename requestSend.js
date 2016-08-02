@@ -154,41 +154,6 @@ function callGeneralAPI(reqObj)
   });
 }
 
-function callTokenAPI(reqObj)
-{
-  // construct a param=value& string and uriEncode
-  var paramsStr = '';
-  for (var i in reqObj) {
-    paramsStr += "&" + i + "=" + reqObj[i];
-  }
-
-  // yank off that first "&"
-  paramsStr = paramsStr.substr(1);
-
-  var sigBaseStr = "POST&"
-                   + encodeURIComponent(fatSecretRestUrl)
-                   + "&"
-                   + encodeURIComponent(paramsStr);
-
-  // no  Access Token token (there's no user .. we're just calling foods.search)
-  sharedSecret2 = sharedSecret + "&" + '9c974fb87f534a5297a850d674b11432';
-
-  var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
-
-
-  // Add oauth_signature to the request object
-  reqObj.oauth_signature = hashedBaseStr;
-
-  // Launch!
-  rest.post(fatSecretRestUrl, {
-    data: reqObj
-  }).on('complete', function(data, response) {
-    //convert the data from XML to JSON format
-    
-      console.log(data);
-  });
-}
-
 function callTokenAPI(reqObj, dataObj)
 {
   // construct a param=value& string and uriEncode
