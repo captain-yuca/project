@@ -229,158 +229,158 @@ function getFoodInfo(data)
   return callGeneralAPI(foodObj);
 }
 
-function requestUserToken(reqObj)
-{
-    // construct a param=value& string and uriEncode
-  var paramsStr = '';
-  for (var i in reqObj) {
-    paramsStr += "&" + i + "=" + reqObj[i];
-  }
+// function requestUserToken(reqObj)
+// {
+//     // construct a param=value& string and uriEncode
+//   var paramsStr = '';
+//   for (var i in reqObj) {
+//     paramsStr += "&" + i + "=" + reqObj[i];
+//   }
 
-  // yank off that first "&"
-  paramsStr = paramsStr.substr(1);
+//   // yank off that first "&"
+//   paramsStr = paramsStr.substr(1);
 
-  var sigBaseStr = "POST&"
-                   + encodeURIComponent(requestTokenUrl)
-                   + "&"
-                   + encodeURIComponent(paramsStr);
+//   var sigBaseStr = "POST&"
+//                    + encodeURIComponent(requestTokenUrl)
+//                    + "&"
+//                    + encodeURIComponent(paramsStr);
 
-  // no  Access Token token (there's no user .. we're just calling foods.search)
-  sharedSecret2 = sharedSecret + "&" ;
+//   // no  Access Token token (there's no user .. we're just calling foods.search)
+//   sharedSecret2 = sharedSecret + "&" ;
 
-  var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
-
-
-  // Add oauth_signature to the request object
-  reqObj.oauth_signature = hashedBaseStr;
-
-  // Launch!
-  rest.post(requestTokenUrl, {
-    data: reqObj
-  }).on('complete', function(data, response) {
-    //convert the data from XML to JSON format
-    console.log(data);
-  });
-}
+//   var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
 
 
-function userAuthorize(reqData)
-{
-    var split = reqData.split('&')[1].split('=')[1];
-    rest.post('http://www.fatsecret.com/oauth/authorize', {
-    data: {oauth_token: split}
-    }).on('complete', function(data, response) {
-      //convert the data from XML to JSON format
-      http.createServer(function(request, response) {
-          response.writeHeader(200, {"Content-Type": "text/html"});
-          response.write(data);
-          response.end();
-      }).listen(8000);
-});
+//   // Add oauth_signature to the request object
+//   reqObj.oauth_signature = hashedBaseStr;
 
-}
-
-function getAccessToken(reqObj)
-{
-    var paramsStr = '';
-  for (var i in reqObj) {
-    paramsStr += "&" + i + "=" + reqObj[i];
-  }
-
-  // yank off that first "&"
-  paramsStr = paramsStr.substr(1);
-
-  var sigBaseStr = "POST&"
-                   + encodeURIComponent('http://www.fatsecret.com/oauth/access_token')
-                   + "&"
-                   + encodeURIComponent(paramsStr);
-
-  // no  Access Token token (there's no user .. we're just calling foods.search)
-  sharedSecret2 = sharedSecret + "&" + 'db87e81b060d4d3a8f3c022a259cc9aa';
-
-  var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
+//   // Launch!
+//   rest.post(requestTokenUrl, {
+//     data: reqObj
+//   }).on('complete', function(data, response) {
+//     //convert the data from XML to JSON format
+//     console.log(data);
+//   });
+// }
 
 
-  // Add oauth_signature to the request object
-  reqObj.oauth_signature = hashedBaseStr;
+// function userAuthorize(reqData)
+// {
+//     var split = reqData.split('&')[1].split('=')[1];
+//     rest.post('http://www.fatsecret.com/oauth/authorize', {
+//     data: {oauth_token: split}
+//     }).on('complete', function(data, response) {
+//       //convert the data from XML to JSON format
+//       http.createServer(function(request, response) {
+//           response.writeHeader(200, {"Content-Type": "text/html"});
+//           response.write(data);
+//           response.end();
+//       }).listen(8000);
+// });
 
-  // Launch!
-  rest.post('http://www.fatsecret.com/oauth/access_token', {
-    data: reqObj
-  }).on('complete', function(data, response) {
-    //convert the data from XML to JSON format
-    console.log(data);
-  });
-}
+// }
 
-function authenticate(reqObj, callback, val)
-{
-    // construct a param=value& string and uriEncode
-  var paramsStr = '';
-  for (var i in reqObj) {
-    paramsStr += "&" + i + "=" + reqObj[i];
-  }
+// function getAccessToken(reqObj)
+// {
+//     var paramsStr = '';
+//   for (var i in reqObj) {
+//     paramsStr += "&" + i + "=" + reqObj[i];
+//   }
 
-  // yank off that first "&"
-  paramsStr = paramsStr.substr(1);
+//   // yank off that first "&"
+//   paramsStr = paramsStr.substr(1);
 
-  var sigBaseStr = "POST&"
-                   + encodeURIComponent(fatSecretRestUrl)
-                   + "&"
-                   + encodeURIComponent(paramsStr);
+//   var sigBaseStr = "POST&"
+//                    + encodeURIComponent('http://www.fatsecret.com/oauth/access_token')
+//                    + "&"
+//                    + encodeURIComponent(paramsStr);
 
-  // no  Access Token token (there's no user .. we're just calling foods.search)
-  sharedSecret2 = sharedSecret + "&";
+//   // no  Access Token token (there's no user .. we're just calling foods.search)
+//   sharedSecret2 = sharedSecret + "&" + 'db87e81b060d4d3a8f3c022a259cc9aa';
 
-  var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
+//   var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
 
-  // Add oauth_signature to the request object
-  reqObj.oauth_signature = hashedBaseStr;
-  // Launch!
-  rest.post(fatSecretRestUrl, {
-    data: reqObj
-  }).on('complete', function(data, response) {
-    //convert the data from XML to JSON format
-      data.customVal = val;
-      callback(data);
-  });
-}
 
-function getProfile(data)
-{
-    var newDate = new Date;
-    var profileFromID = {
-    format: 'json',
-    method: 'profile.get',
-    oauth_consumer_key: apiKey,
-    oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
-    oauth_signature_method: 'HMAC-SHA1',
-    oauth_timestamp: Math.floor(newDate.getTime() / 1000),
-    oauth_token: data.profile.auth_token.toString(),
-    oauth_version: '1.0'
-  };
-  callTokenAPI(profileFromID, data);
-}
+//   // Add oauth_signature to the request object
+//   reqObj.oauth_signature = hashedBaseStr;
 
-//current height and goal weight arent required, and require us to customize it for first time use
-function editWeight(data)
-{
-    var newDate = new Date;
-    var profileFromID = {
-    //current_height_cm: 200,
-    current_weight_kg: data.customVal,
-    format: 'json',
-    //goal_weight_kg: 100,
-    method: 'weight.update',
-    oauth_consumer_key: apiKey,
-    oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
-    oauth_signature_method: 'HMAC-SHA1',
-    oauth_timestamp: Math.floor(newDate.getTime() / 1000),
-    oauth_token: data.profile.auth_token.toString(),
-    oauth_version: '1.0'
-  };
-  callTokenAPI(profileFromID, data);
-}
+//   // Launch!
+//   rest.post('http://www.fatsecret.com/oauth/access_token', {
+//     data: reqObj
+//   }).on('complete', function(data, response) {
+//     //convert the data from XML to JSON format
+//     console.log(data);
+//   });
+// }
+
+// function authenticate(reqObj, callback, val)
+// {
+//     // construct a param=value& string and uriEncode
+//   var paramsStr = '';
+//   for (var i in reqObj) {
+//     paramsStr += "&" + i + "=" + reqObj[i];
+//   }
+
+//   // yank off that first "&"
+//   paramsStr = paramsStr.substr(1);
+
+//   var sigBaseStr = "POST&"
+//                    + encodeURIComponent(fatSecretRestUrl)
+//                    + "&"
+//                    + encodeURIComponent(paramsStr);
+
+//   // no  Access Token token (there's no user .. we're just calling foods.search)
+//   sharedSecret2 = sharedSecret + "&";
+
+//   var hashedBaseStr  = crypto.createHmac('sha1', sharedSecret2).update(sigBaseStr).digest('base64');
+
+//   // Add oauth_signature to the request object
+//   reqObj.oauth_signature = hashedBaseStr;
+//   // Launch!
+//   rest.post(fatSecretRestUrl, {
+//     data: reqObj
+//   }).on('complete', function(data, response) {
+//     //convert the data from XML to JSON format
+//       data.customVal = val;
+//       callback(data);
+//   });
+// }
+
+// function getProfile(data)
+// {
+//     var newDate = new Date;
+//     var profileFromID = {
+//     format: 'json',
+//     method: 'profile.get',
+//     oauth_consumer_key: apiKey,
+//     oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+//     oauth_signature_method: 'HMAC-SHA1',
+//     oauth_timestamp: Math.floor(newDate.getTime() / 1000),
+//     oauth_token: data.profile.auth_token.toString(),
+//     oauth_version: '1.0'
+//   };
+//   callTokenAPI(profileFromID, data);
+// }
+
+// //current height and goal weight arent required, and require us to customize it for first time use
+// function editWeight(data)
+// {
+//     var newDate = new Date;
+//     var profileFromID = {
+//     //current_height_cm: 200,
+//     current_weight_kg: data.customVal,
+//     format: 'json',
+//     //goal_weight_kg: 100,
+//     method: 'weight.update',
+//     oauth_consumer_key: apiKey,
+//     oauth_nonce: Math.random().toString(36).replace(/[^a-z]/g, '').substr(2),
+//     oauth_signature_method: 'HMAC-SHA1',
+//     oauth_timestamp: Math.floor(newDate.getTime() / 1000),
+//     oauth_token: data.profile.auth_token.toString(),
+//     oauth_version: '1.0'
+//   };
+//   callTokenAPI(profileFromID, data);
+// }
 
 function editRyanWeight(data, number)
 {
